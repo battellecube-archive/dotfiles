@@ -105,34 +105,26 @@ sudo rm -f /etc/apt/sources.list.d/{github-cli.list,terraform-cli.list,cube-env.
 
 install-common-packages
 
-type -p gh &>>$LOGFILE || {
-	echo -n "Installing Github CLI..."
-	install-github-cli &>>$LOGFILE
-	echo "done."
-}
+echo -n "Installing Github CLI..."
+install-github-cli &>>$LOGFILE
+echo "done."
 
-type -p terraform &>>$LOGFILE || {
-	echo -n "Install Terraform CLI..."
-	install-terraform-cli &>>$LOGFILE
-	echo "done."
-}
+echo -n "Install Terraform CLI..."
+install-terraform-cli &>>$LOGFILE
+echo "done."
 
-type -p az &>>$LOGFILE || {
-	echo -n "Install Azure CLI..."
-	install-azure-cli &>>$LOGFILE
-	echo "done."
-}
+echo -n "Install Azure CLI..."
+install-azure-cli &>>$LOGFILE
+echo "done."
 
 gh auth status &>>$LOGFILE || {
 	echo "Need to login into gh to continue"
 	gh auth login
 }
 
-type -p cube &>>$LOGFILE || {
-	echo -n "Installing CUBE CLI..."
-	install-cube-cli #&>>$LOGFILE
-	echo "done."
-}
+echo -n "Installing CUBE CLI..."
+install-cube-cli #&>>$LOGFILE
+echo "done."
 
 ############### end install-tools
 
