@@ -137,12 +137,30 @@ type -p cube &>>$LOGFILE || {
 ############### end install-tools
 
 
+####################
+# Hook user dotfiles
+####################
+
+# get the github authenticated name
+GH_AUTH_NAME=$(gh auth status | grep -oP 'github.com account \K[^ ]+')
+# look for a code block in the README.md of the dotfiles repo
+BOOTSTRAP=$(gh api repos/$GH_AUTH_NAME/dotfiles/contents/.github/README.md -H "Accept: application/vnd.github.v3.raw" 2>/dev/null| sed -n '/^```/,/^```/p' | sed '/^```/d');
+# let's check one more place
+[ -z "$BOOTSTRAP" ] && {
+	BOOTSTRAP=$(gh api repos/$GH_AUTH_NAME/dotfiles/contents/README.md -H "Accept: application/vnd.github.v3.raw" 2>/dev/null| sed -n '/^```/,/^```/p' | sed '/^```/d');
+}
+[ -n "$BOOTSTRAP" ] && {
+	bash <<-END
+	$BOOTSTRAP
+	END
+}
+
 ############### begin configure-dotfiles
 
 # TODO How the username and email is determined and verified will change when
 # we move to Github EMU, as it's tied to our enterprise user directory. For now
 # we'll use `git` to bootstrap the current this info for now.
-GH_USER_NAME=$(git config --global user.name)
+GH_USER_NAME=$(git config --global user.name || true)
 
 # Show current username and prompt for a new one
 echo "Current Github username: $GH_USER_NAME"
@@ -157,7 +175,7 @@ fi
 git config --global user.name "$GH_USER_NAME"
 
 # Get the current global Git email
-GH_USER_EMAIL=$(git config --global user.email)
+GH_USER_EMAIL=$(git config --global user.email || true)
 
 # Show current email and prompt for a new one
 echo "Current Github email: $GH_USER_EMAIL"
@@ -250,43 +268,7 @@ Git
 
 END
 
-read -rp "Is the above information correct? [y/N]: " response
-
-# Convert response to lowercase and check
-case "${response,,}" in
-    y|yes) 
-        echo "Proceeding with the operation."
-        ;;
-    *) 
-        echo "Operation aborted."
-        exit 1
-        ;;
-esac
-
-
 ############### end configure-dotfiles
-
-
-
-
-
-####################
-# Hook user dotfiles
-####################
-
-# get the github authenticated name
-GH_AUTH_NAME=$(gh auth status | grep -oP 'github.com account \K[^ ]+')
-# look for a code block in the README.md of the dotfiles repo
-BOOTSTRAP=$(gh api repos/$GH_AUTH_NAME/dotfiles/contents/.github/README.md -H "Accept: application/vnd.github.v3.raw" 2>/dev/null| sed -n '/^```/,/^```/p' | sed '/^```/d');
-# let's check one more place
-[ -z "$BOOTSTRAP" ] && {
-	BOOTSTRAP=$(gh api repos/$GH_AUTH_NAME/dotfiles/contents/README.md -H "Accept: application/vnd.github.v3.raw" 2>/dev/null| sed -n '/^```/,/^```/p' | sed '/^```/d');
-}
-[ -n "$BOOTSTRAP" ] && {
-	bash <<-END
-	$BOOTSTRAP
-	END
-}
 
 echo -e "\n\tSee $LOGFILE for detailed output"
 echo -e "\nFinished!"
