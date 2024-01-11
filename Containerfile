@@ -12,6 +12,7 @@ RUN apt update && apt install -y --no-install-recommends \
     tzdata \
     curl \
     sudo \
+    make \
     ubuntu-minimal && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
@@ -22,5 +23,9 @@ RUN useradd -m tester && \
     echo "tester:tester" | chpasswd && \
     adduser tester sudo
 
-USER tester
 WORKDIR /home/tester
+
+ADD Makefile .
+RUN make base-packages
+
+USER tester

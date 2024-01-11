@@ -37,10 +37,8 @@ install-github-cli: base-packages
 	sudo apt install gh -yqq
 
 # Need to move to building the files then installing them. This will allow make clean to work as well.
-install-cube-cli: install-github-cli
-	gh repo clone battellecube/cube-env $(REPO)
-	git -C $(REPO) checkout deb_repo
-	cat $(REPO)/KEY.gpg | gpg --dearmor | sudo dd of=/usr/share/keyrings/cubeenvcli-archive-keyring.gpg
+install-cube-cli: base-packages
+	curl -sSL https://battellecube.github.io/cube-env/KEY.gpg | gpg --dearmor | sudo dd of=/usr/share/keyrings/cubeenvcli-archive-keyring.gpg
 	sudo chmod go+r /usr/share/keyrings/cubeenvcli-archive-keyring.gpg
 	echo "deb [arch=$(ARCH) signed-by=/usr/share/keyrings/cubeenvcli-archive-keyring.gpg] https://battellecube.github.io/cube-env ./" | sudo tee /etc/apt/sources.list.d/cube-env.list > /dev/null
 	echo "deb-src [arch=$(ARCH) signed-by=/usr/share/keyrings/cubeenvcli-archive-keyring.gpg] https://battellecube.github.io/cube-env ./" | sudo tee -a /etc/apt/sources.list.d/cube-env.list > /dev/null
