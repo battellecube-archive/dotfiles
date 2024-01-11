@@ -40,10 +40,13 @@ install-github-cli: base-packages
 install-cube-cli: install-github-cli
 	gh repo clone battellecube/cube-env $(REPO)
 	git -C $(REPO) checkout deb_repo
-	cat KEY.gpg | gpg --dearmor | sudo dd of=/usr/share/keyrings/cubeenvcli-archive-keyring.gpg
+	cat $(REPO)/KEY.gpg | gpg --dearmor | sudo dd of=/usr/share/keyrings/cubeenvcli-archive-keyring.gpg
 	sudo chmod go+r /usr/share/keyrings/cubeenvcli-archive-keyring.gpg
 	echo "deb [arch=$(ARCH) signed-by=/usr/share/keyrings/cubeenvcli-archive-keyring.gpg] https://battellecube.github.io/cube-env ./" | sudo tee /etc/apt/sources.list.d/cube-env.list > /dev/null
 	echo "deb-src [arch=$(ARCH) signed-by=/usr/share/keyrings/cubeenvcli-archive-keyring.gpg] https://battellecube.github.io/cube-env ./" | sudo tee -a /etc/apt/sources.list.d/cube-env.list > /dev/null
 	sudo apt update -qq
 	sudo apt install -yqq cube-env
 	sudo apt build-dep -yqq cube-env
+
+user-packages:
+	echo "Hook user dotfiles here"
