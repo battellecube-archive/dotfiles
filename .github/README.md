@@ -9,7 +9,7 @@ Just do this and you're done.
 
 
 ```sh
-curl -sSL -o /tmp/bootstrap-dotfiles.sh https://raw.githubusercontent.com/battellecube/dotfiles/main/.local/bin/bootstrap-dotfiles.sh
+curl -sSL -o /tmp/bootstrap-dotfiles.sh https://raw.githubusercontent.com/battellecube/dotfiles/v0.1.0/.local/bin/bootstrap-dotfiles.sh
 bash /tmp/bootstrap-dotfiles.sh
 ```
 
