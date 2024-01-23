@@ -17,15 +17,12 @@ RUN apt update && apt install -y --no-install-recommends \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-FROM base as final
+FROM base as tools
 
-RUN useradd -m tester && \
-    echo "tester:tester" | chpasswd && \
-    adduser tester sudo
+COPY Makefile .
+RUN make all
 
-WORKDIR /home/tester
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-ADD Makefile .
-RUN make base-packages
-
-USER tester
+ENTRYPOINT ["/entrypoint.sh"]

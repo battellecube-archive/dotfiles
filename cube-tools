@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+if [ -z "$(type -p podman)" ]; then
+	sudo apt update
+	sudo apt install podman
+fi
+
+podman run -e USERNAME=$USER -e USERID=$UID -v $HOME:$HOME -it --name cube-tools-$USER cube-tools
+
