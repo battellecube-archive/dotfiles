@@ -9,10 +9,11 @@ RUN echo 'tzdata tzdata/Areas select America' | debconf-set-selections && \
 
 RUN apt update && apt install -y --no-install-recommends \
     ca-certificates \
-    tzdata \
     curl \
-    sudo \
+    gosu \
     make \
+    sudo \
+    tzdata \
     ubuntu-minimal && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*

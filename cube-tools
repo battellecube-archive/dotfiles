@@ -10,7 +10,7 @@ CONTAINER="cube-tools-$USER"
 STATUS="$(podman inspect --format '{{.State.Status}}' $CONTAINER 2>/dev/null)"
 
 case $STATUS in
-	exited)
+	exited|created)
 		echo -n "Starting..."
 		podman start $CONTAINER
 		;& # ;& means fall-through
@@ -19,6 +19,6 @@ case $STATUS in
 		podman attach $CONTAINER
 		;;
 	*)
-		podman run -e USERNAME=$USER -e USERID=$UID -v $HOME:$HOME -it --name cube-tools-$USER cube-tools
+		podman run -e USERNAME=$USER -e USERID=$UID -v $HOME:$HOME -it --name cube-tools-$USER cube-tools bash
 		;;
 esac
