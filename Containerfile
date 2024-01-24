@@ -27,3 +27,9 @@ COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
+RUN useradd -m qb && \
+    echo "qb:qb" | chpasswd && \
+    adduser qb sudo
+
+USER qb
+WORKDIR /home/qb

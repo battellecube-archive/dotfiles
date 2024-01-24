@@ -1,12 +1,5 @@
 #!/usr/bin/env bash
 
+echo "Maybe setup credentials here??"
 
-if [ ! $(id $USERNAME) ]; then
-	adduser \
-		--disabled-password \
-		--gecos '' \
-		--uid $USERID \
-		"$USERNAME"
-
-fi
-exec gosu $USERNAME "$@"
+exec $@

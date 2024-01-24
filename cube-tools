@@ -19,6 +19,6 @@ case $STATUS in
 		podman attach $CONTAINER
 		;;
 	*)
-		podman run -e USERNAME=$USER -e USERID=$UID -v $HOME:$HOME -it --name cube-tools-$USER cube-tools bash
+		podman run -it --name $CONTAINER cube-tools bash
 		;;
 esac
