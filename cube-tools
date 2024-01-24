@@ -5,5 +5,20 @@ if [ -z "$(type -p podman)" ]; then
 	sudo apt install podman
 fi
 
-podman run -e USERNAME=$USER -e USERID=$UID -v $HOME:$HOME -it --name cube-tools-$USER cube-tools
+CONTAINER="cube-tools-$USER"
 
+STATUS="$(podman inspect --format '{{.State.Status}}' $CONTAINER 2>/dev/null)"
+
+case $STATUS in
+	exited)
+		echo -n "Starting..."
+		podman start $CONTAINER
+		;& # ;& means fall-through
+	running)
+		echo "Attaching to running container. Press <enter> for new prompt."
+		podman attach $CONTAINER
+		;;
+	*)
+		podman run -e USERNAME=$USER -e USERID=$UID -v $HOME:$HOME -it --name cube-tools-$USER cube-tools
+		;;
+esac
