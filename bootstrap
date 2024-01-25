@@ -3,31 +3,13 @@
 set -e
 
 
-################################################################################
-#
-#	CONFIGURE ENV TO RUN THIS SCRIPT
-#
-################################################################################
-
-# Ensure the user is not root and has sudo privileges
-if [[ "$(id -u)" == "0" ]]; then
-    echo "This script should not be run as root. Please run as a regular user with sudo privileges."
-	exit 1
-else
-    # Check if the user can run commands with sudo
-    if sudo -v; then
-        echo "Sudo access confirmed."
-    else
-        echo "You need sudo privileges to run this script."
-        exit 1
-    fi
-fi
-
-
 ####################
 # Hook user dotfiles
 ####################
 
+if [ ! -r .config/gh/hosts.yml ]; then
+	gh auth login
+fi
 # get the github authenticated name
 GH_AUTH_NAME=$(gh auth status | grep -oP 'github.com account \K[^ ]+')
 # look for a code block in the README.md of the dotfiles repo
@@ -43,54 +25,24 @@ BOOTSTRAP=$(gh api repos/$GH_AUTH_NAME/dotfiles/contents/.github/README.md -H "A
 }
 
 ############### begin configure-dotfiles
-
-# TODO How the username and email is determined and verified will change when
-# we move to Github EMU, as it's tied to our enterprise user directory. For now
-# we'll use `git` to bootstrap the current this info for now.
-GH_USER_NAME=$(git config --global user.name || true)
-
-# Show current username and prompt for a new one
-echo "Current Github username: $GH_USER_NAME"
-read -p "Enter new Github username (or press enter to keep current): " NEW_USER_NAME
-
-# Update the username only if a new one is provided
-if [ -n "$NEW_USER_NAME" ]; then
-	GH_USER_NAME="$NEW_USER_NAME"
+output=$(gh auth status)
+scopes_exist=true
+required_scopes=("delete_repo" "write:gpg_key" "user")
+for scope in "${required_scopes[@]}"; do
+    if ! echo "$output" | grep -q "$scope"; then
+        scopes_exist=false
+        break
+    fi
+done
+if [ "$scopes_exist" = false ]; then
+    gh auth refresh --scopes delete_repo,write:gpg_key,user
 fi
 
-# Set the new or existing username globally
+GH_USER_NAME=$GH_AUTH_NAME
 git config --global user.name "$GH_USER_NAME"
 
-# Get the current global Git email
-GH_USER_EMAIL=$(git config --global user.email || true)
-
-# Show current email and prompt for a new one
-echo "Current Github email: $GH_USER_EMAIL"
-read -p "Enter new Github email (or press enter to keep current): " NEW_USER_EMAIL
-
-# Update the email only if a new one is provided
-if [ -n "$NEW_USER_EMAIL" ]; then
-	GH_USER_EMAIL="$NEW_USER_EMAIL"
-fi
-
-# Set the new or existing email globally
+GH_USER_EMAIL=$(gh api user/emails --jq '.[] | select(.primary == true) | .email')
 git config --global user.email "$GH_USER_EMAIL"
-
-# Fetch the current authentication status and store it in a variable
-output=$(gh auth status)
-
-# Initialize a flag variable to track if required scopes are present
-scopes_exist=false
-
-# Check if both required scopes 'delete_repo' and 'write:gpg_key' are present in the output
-if echo "$output" | grep -q "delete_repo" && echo "$output" | grep -q "write:gpg_key"; then
-	scopes_exist=true
-fi
-
-# If the required scopes are not present, refresh authentication with the necessary scopes
-if [ "$scopes_exist" = false ]; then
-	gh auth refresh --scopes delete_repo,write:gpg_key
-fi
 
 # Fetch GPG keys associated with a specific email domain from GitHub and store them in an array
 GPG_KEYS=($(gh gpg-key list | awk '/battelle.org/{print $2}'))
@@ -159,3 +111,5 @@ END
 
 echo -e "\n\tSee $LOGFILE for detailed output"
 echo -e "\nFinished!"
+
+exec $@
