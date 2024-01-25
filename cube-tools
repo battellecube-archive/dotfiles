@@ -5,7 +5,7 @@ if [ -z "$(type -p podman)" ]; then
 	sudo apt install podman
 fi
 
-CONTAINER="cube-tools-$USER"
+CONTAINER="cube-tools-qb"
 
 STATUS="$(podman inspect --format '{{.State.Status}}' $CONTAINER 2>/dev/null)"
 

@@ -10,6 +10,8 @@ _NOTE: For now you need to **export BRANCH=your-dev-branch** until this gets
 merged to `main`_
 
 ```sh
+mkdir ~/.local/bin
+source ~/.profile
 curl -sSL -o ~/.local/bin/cube-tools https://raw.githubusercontent.com/battellecube/dotfiles/$BRANCH/cube-tools
 chmod +x ~/.local/bin/cube-tools
 ```
@@ -25,17 +27,17 @@ cube-tools
 
 Build the base `cube-tools` image
 ```sh
-build -t -f Containerfile.cube-tools cube-tools .
+podman build -f Containerfile.cube-tools -t cube-tools .
 ```
 
 Build the `cube-tools-qb` image
 ```sh
-build -f Containerfile -t cube-tools-qb
+podman build -f Containerfile -t cube-tools-qb
 ```
 
 Create and run a `cube-tools-qb container
 ```sh
-run -it -rm cube-tools-qb:latest bash
+podman run -it --rm cube-tools-qb:latest bash
 ```
 
 Clean-up after yourself
