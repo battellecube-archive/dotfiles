@@ -11,6 +11,7 @@ merged to `main`_
 
 ```sh
 curl -sSL -o ~/.local/bin/cube-tools https://raw.githubusercontent.com/battellecube/dotfiles/$BRANCH/cube-tools
+chmod +x ~/.local/bin/cube-tools
 ```
 
 That will pull down a help script to run your container.  Assuming `~/.local/bin` is in your path, you should be able to run you container.
