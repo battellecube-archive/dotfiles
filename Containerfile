@@ -1,35 +1,13 @@
-FROM ubuntu as base
+FROM cube-tools
 
-ENV DEBIAN_FRONTEND=noninteractive
-ENV APT_LISTCHANGES_FRONTEND=none
-ENV APT_LISTBUGS_FRONTEND=none
+COPY bootstrap /bootstrap
+RUN chmod +x /bootstrap
 
-RUN echo 'tzdata tzdata/Areas select America' | debconf-set-selections && \
-    echo 'tzdata tzdata/Zones/America select New_York' | debconf-set-selections
-
-RUN apt update && apt install -y --no-install-recommends \
-    ca-certificates \
-    curl \
-    gosu \
-    make \
-    sudo \
-    tzdata \
-    ubuntu-minimal && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
-FROM base as tools
-
-COPY Makefile .
-RUN make all
-
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/bootstrap"]
 RUN useradd -m qb && \
     echo "qb:qb" | chpasswd && \
     adduser qb sudo
 
 USER qb
 WORKDIR /home/qb
+
